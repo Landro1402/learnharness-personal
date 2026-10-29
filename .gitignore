@@ -19,3 +19,19 @@ xai-credentials.json*
 
 # dev-fresh launcher scratch (fresh-user sim): disposable per launch
 .fresh-data/
+
+# Fork publication: private runtime state and local build/export artifacts
+.env
+.env.*
+!.env.example
+**/auth.json
+**/*credentials.json*
+backups/
+personal-profile/
+*.wav
+*.mp3
+*.zip
+*.exe
+*.lnk
+*.pem
+*.key

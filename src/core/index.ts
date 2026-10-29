@@ -1,3 +1,4 @@
+// LearnHarness Personal modifications maintained by Landro1402, 2026-10-29. See NOTICE.md and LICENSE (AGPL-3.0-only).
 /**
  * THE CORE PUBLIC API — the only module the shell (app/, components/) may
  * import. Everything exported here is browser-safe: pure logic + types,
@@ -60,6 +61,8 @@ export * from "./fuzzy.ts";
 // view. Browser-safe — the Wave-4 panel imports these directly.
 export * from "./settings.ts";
 export * from "./dictation.ts";
+export * from "./read-aloud.ts";
+export * from "./google-speech.ts";
 // graph-deletion.ts (wave 6): the whole module is PURE but storage-port
 // driven — the deletion RUNS server-side only. The shell needs exactly one
 // two type-only things from it: the ChatDeleteMode union (the delete

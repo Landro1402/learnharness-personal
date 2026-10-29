@@ -1,4 +1,5 @@
 "use client";
+// LearnHarness Personal modifications maintained by Landro1402, 2026-10-29. See NOTICE.md and LICENSE (AGPL-3.0-only).
 
 import { useState } from "react";
 import { ConfidenceRail } from "@/components/confidence-rail";
@@ -8,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { ToolContentResponse } from "@/components/ai-elements/message";
 import type { QuestionAnswerData } from "@/src/core";
 import { answerForPresentation, parseAskInput, parseQuizInput } from "@/src/core";
+import { ReadAloud } from "@/components/read-aloud";
 
 /**
  * Static rendering of an answered question (tool part in `output-available`).
@@ -215,6 +217,7 @@ export function AnsweredCard({ answer: savedAnswer, input }: { answer: QuestionA
 							{/* Keep the first paragraph beside the label, not every paragraph:
 							   later paragraphs must retain their recovered document structure. */}
 							<ToolContentResponse className="inline [&>p:first-child]:inline [&>p:first-child]:m-0">{answer.explanation}</ToolContentResponse>
+							<ReadAloud text={answer.explanation} />
 						</div>
 					)}
 				</div>
@@ -227,6 +230,7 @@ export function AnsweredCard({ answer: savedAnswer, input }: { answer: QuestionA
 				<div className="mt-3 rounded-lg bg-muted py-2 text-sm text-muted-foreground">
 					<span className="font-medium text-foreground">The answer: </span>
 					<ToolContentResponse className="inline [&>p:first-child]:inline [&>p:first-child]:m-0">{answer.committed}</ToolContentResponse>
+					<ReadAloud text={answer.committed} />
 				</div>
 			)}
 		</div>

@@ -1,3 +1,5 @@
+> Upstream release reference. For this independent fork use [fork-desktop.md](fork-desktop.md); the upstream workflows are archived and not active.
+
 # Desktop builds and releases
 
 ## Platforms

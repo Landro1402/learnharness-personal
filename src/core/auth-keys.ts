@@ -1,3 +1,4 @@
+// LearnHarness Personal modifications maintained by Landro1402, 2026-10-29. See NOTICE.md and LICENSE (AGPL-3.0-only).
 /**
  * The curated auth-key catalog + shape rules (auth-keys wave, 2026-09-19).
  * PURE, browser-safe — no fs, no env. The catalog drives the auth page's
@@ -30,6 +31,12 @@ export interface AuthKeyInfo {
 }
 
 export const AUTH_KEYS: readonly AuthKeyInfo[] = [
+	{
+		id: "GEMINI_TTS_API_KEY",
+		label: "Google speech",
+		description: "Gemini text-to-speech for Read aloud. Use a Google AI Studio project on the Free plan; billing is managed by Google.",
+		docsUrl: "https://aistudio.google.com/api-keys",
+	},
 	{
 		id: "DEEPGRAM_API_KEY",
 		label: "Deepgram",
@@ -154,6 +161,8 @@ export function validateKeyShape(id: string, rawValue: string): KeyShapeResult {
 			? { ok: true as const }
 			: { ok: false as const, error: `${id} must be at least ${min} characters with no whitespace` };
 	switch (id) {
+		case "GEMINI_TTS_API_KEY":
+			return nonEmpty(20);
 		case "TAVILY_API_KEY":
 			return value.startsWith("tvly-")
 				? nonEmpty(20)
@@ -182,7 +191,7 @@ export function genericProviderKeyGuard(id: string, rawValue: string): KeyShapeR
  *  rotating between several, and to spot a mis-pasted family). */
 export function maskKey(value: string): string {
 	const v = value.trim();
-	if (v.length <= 4) return `…${v}`; // degenerate paste — still never the whole value
+	if (v.length < 12) return "…"; // Short legacy values must not expose all or most of their entropy.
 	return `…${v.slice(-4)}`;
 }
 

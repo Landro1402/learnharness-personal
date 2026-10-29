@@ -1,3 +1,4 @@
+// LearnHarness Personal modifications maintained by Landro1402, 2026-10-29. See NOTICE.md and LICENSE (AGPL-3.0-only).
 /**
  * The settings wave's pure layers (thin settings wave): the appearance →
  * CSS-variable mapping (the section must actually DO something), the
@@ -250,12 +251,13 @@ describe("classifyKeys — the Keys section's two-group projection", () => {
 	it("curated tool ids always render (synthesized when absent)", () => {
 		const out = classifyKeys([synth("DEEPGRAM_API_KEY", true)], undefined);
 		assert.deepEqual(out.toolRows.map((r) => r.id), [
+			"GEMINI_TTS_API_KEY",
 			"DEEPGRAM_API_KEY",
 			"TAVILY_API_KEY",
 			"BRAVE_API_KEY",
 		]);
-		assert.ok(out.toolRows[0]!.present);
-		assert.ok(!out.toolRows[1]!.present);
+		assert.ok(out.toolRows.find((r) => r.id === "DEEPGRAM_API_KEY")!.present);
+		assert.ok(!out.toolRows.find((r) => r.id === "GEMINI_TTS_API_KEY")!.present);
 	});
 
 	it("unknown file vars surface read-only, out of the provider rows", () => {

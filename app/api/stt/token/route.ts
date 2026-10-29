@@ -1,3 +1,4 @@
+// LearnHarness Personal modifications maintained by Landro1402, 2026-10-29. See NOTICE.md and LICENSE (AGPL-3.0-only).
 /**
  * POST-less BYOK mint: the renderer never holds the real Deepgram key.
  *
@@ -31,9 +32,8 @@ export async function GET() {
 			body: JSON.stringify({ ttl_seconds: 300 }),
 		});
 		if (!res.ok) {
-			const detail = await res.text();
 			return Response.json(
-				{ message: `Deepgram token grant failed (${res.status}): ${detail.slice(0, 200)}` },
+				{ message: res.status === 403 ? "Deepgram rejected token creation. Check that your key has Member permission or higher." : `Deepgram token creation failed (${res.status}). Check the key and project in Deepgram.` },
 				{ status: 502 },
 			);
 		}

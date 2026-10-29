@@ -1,4 +1,5 @@
 "use client";
+// LearnHarness Personal modifications maintained by Landro1402, 2026-10-29. See NOTICE.md and LICENSE (AGPL-3.0-only).
 
 import { useCallback, useRef, useState } from "react";
 import { ChevronRightIcon } from "lucide-react";
@@ -7,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { joinDictation, useDictationTarget } from "@/components/dictation";
 import { useEnterSubmits } from "@/components/enter-submits";
 import { cn } from "@/lib/utils";
+import { ReadAloud } from "@/components/read-aloud";
 
 /**
  * The practice dock (practice sessions, owner design 2026-10-04): an
@@ -110,6 +112,7 @@ export function PracticeDock({ problemCallId, input, expanded, onExpand, onSubmi
 				<div className="lh-prose text-[15px]">
 					<ToolContentResponse>{input.statement}</ToolContentResponse>
 				</div>
+				<ReadAloud text={input.statement} />
 			</div>
 
 			{/* The learner's half: Enter SENDS (owner round 2, 2026-10-05);

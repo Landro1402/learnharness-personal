@@ -1,4 +1,5 @@
 "use client";
+// LearnHarness Personal modifications maintained by Landro1402, 2026-10-29. See NOTICE.md and LICENSE (AGPL-3.0-only).
 
 import { createContext, Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useChatSession } from "@/components/session";
@@ -81,6 +82,7 @@ import {
 } from "@/src/core";
 import { ReadingThinkingField } from "@/components/reading-thinking";
 import { currentUserThinkingOpen, setAllUserThinkingOpen } from "@/components/thinking-block";
+import { ReadAloud, ReadAloudProvider } from "@/components/read-aloud";
 
 /** One width for everything: transcript, cards, and the bottom blob share this column. */
 /**
@@ -455,6 +457,7 @@ export function Chat({
 	// replaces the composer. Computed from the NATIVE record (the fold is
 	// the gate the tools themselves read), not the projected view.
 	const activeProblem = activeProblemOf(nativeMessages);
+	const latestAssistantMessageId = nativeMessages.findLast((message) => message.role === "assistant")?.id;
 	const activeProblemRef = useRef(activeProblem);
 	activeProblemRef.current = activeProblem;
 
@@ -1243,6 +1246,7 @@ export function Chat({
 	};
 
 	return (
+		<ReadAloudProvider sessionId={chatId}>
 		<ChatActionsContext.Provider
 			value={{
 				chatId,
@@ -1549,6 +1553,8 @@ export function Chat({
 														return (
 															<div key={part.id || pi} id={anchor} data-source-message-id={sourceId ?? undefined} className="lh-source-passage">
 																<MessageResponse>{part.text}</MessageResponse>
+																<ReadAloud text={part.text ?? ""}
+																	disabled={sourceId === latestAssistantMessageId && (status === "streaming" || status === "submitted" || turnInFlight)} />
 															</div>
 														);
 													}
@@ -1791,6 +1797,7 @@ export function Chat({
 			}}
 		/>
 		</ChatActionsContext.Provider>
+		</ReadAloudProvider>
 	);
 }
 

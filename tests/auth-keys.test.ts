@@ -1,3 +1,4 @@
+// LearnHarness Personal modifications maintained by Landro1402, 2026-10-29. See NOTICE.md and LICENSE (AGPL-3.0-only).
 /**
  * The curated auth-key catalog + shape rules (auth-keys wave, 2026-09-19;
  * search wave 2026-09-20: the Google CSE pair retired, Tavily + Brave in)
@@ -12,10 +13,10 @@ import { describe, it } from "node:test";
 import { AUTH_KEYS, genericProviderKeyGuard, isKnownAuthKey, maskKey, validateKeyShape } from "../src/core/auth-keys.ts";
 
 describe("the catalog", () => {
-	it("is exactly the three CURATED app-service keys (provider keys live in the provider table)", () => {
+	it("lists the personal speech key and original app-service keys (provider keys live in the provider table)", () => {
 		assert.deepEqual(
 			AUTH_KEYS.map((k) => k.id),
-			["DEEPGRAM_API_KEY", "TAVILY_API_KEY", "BRAVE_API_KEY"],
+			["GEMINI_TTS_API_KEY", "DEEPGRAM_API_KEY", "TAVILY_API_KEY", "BRAVE_API_KEY"],
 		);
 		for (const k of AUTH_KEYS) {
 			assert.ok(k.label.length > 0, `${k.id} has a label`);
@@ -42,6 +43,11 @@ describe("the catalog", () => {
 });
 
 describe("validateKeyShape (the 400 gate — curated keys)", () => {
+	it("Google speech rejects empty, truncated or whitespace-containing pastes", () => {
+		assert.ok(validateKeyShape("GEMINI_TTS_API_KEY", "test-google-key-0123456789").ok);
+		assert.ok(!validateKeyShape("GEMINI_TTS_API_KEY", "short").ok);
+		assert.ok(!validateKeyShape("GEMINI_TTS_API_KEY", "invalid key with spaces 0123456789").ok);
+	});
 	it("Tavily: tvly- prefix required, length floor past it", () => {
 		assert.ok(validateKeyShape("TAVILY_API_KEY", "tvly-abc123def456ghi78").ok);
 		assert.ok(!validateKeyShape("TAVILY_API_KEY", "sk-or-v1-abcdefghij").ok, "wrong family");
@@ -98,9 +104,9 @@ describe("maskKey (plaintext never leaves)", () => {
 	});
 
 	it("never reveals a degenerate short value in full", () => {
-		assert.equal(maskKey("ab"), "…ab");
-		assert.equal(maskKey("abcd"), "…abcd");
-		assert.equal(maskKey("abcde"), "…bcde");
+		assert.equal(maskKey("ab"), "…");
+		assert.equal(maskKey("abcd"), "…");
+		assert.equal(maskKey("abcde"), "…");
 	});
 
 	it("trims before masking", () => {

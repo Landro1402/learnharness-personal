@@ -1,81 +1,59 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/lh_banner_dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="docs/assets/lh_banner_light.png">
-    <img src="docs/assets/lh_banner_light.png" alt="LearnHarness" width="640">
-  </picture>
-</p>
+# LearnHarness Personal
 
-<p align="center"><strong>An agent harness for learning.</strong></p>
+Independent fork of [LearnHarness](https://github.com/amosblomqvist/learnharness), originally developed by **Amos Blomqvist**. Maintained by [Landro1402](https://github.com/Landro1402).
 
-<p align="center">
-  <a href="https://learnharness.ai">Download</a> ·
-  <a href="#how-it-works">How it works</a> ·
-  <a href="docs/development.md">Documentation</a> ·
-  <a href="https://github.com/amosblomqvist/learnharness/issues">Issues</a> ·
-  <a href="https://discord.gg/5tCHHQEB2e">Discord</a>
-</p>
+Based on upstream **0.3.9**, commit [`3dd5211`](https://github.com/amosblomqvist/learnharness/commit/3dd52110bbcbcba81645453ce0a8fdc230594c47). Modifications dated **2026-10-29**. Distributed under **AGPL-3.0-only**; see [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md).
 
-LearnHarness uses AI agents to plan and teach lessons from your current understanding to your goal. It builds a detailed picture of what you understand and how you reason. That picture is updated as you learn.
+## Added in this fork
 
-Instead of just giving you an explanation, it uses your answers and thinking to decide what you need next. Teaching builds understanding one reasoning step at a time. Practice makes it usable. A persistent knowledge graph carries it across sessions.
+- Google Gemini text-to-speech with English and Italian tutor delivery.
+- Read-aloud controls on individual assistant passages, including earlier responses grouped in the transcript.
+- Voice/model selection, pause/resume/stop and local playback speed.
+- Recordings cached locally to avoid repeated generation requests. Existing English recordings remain compatible.
+- A separate desktop identity and profile, **LearnHarness Personal**. Official upstream updates are disabled for this variant.
 
-![LearnHarness teaching session](docs/assets/teaching-session.png)
+The teaching engine, questions, practice and knowledge graph come from LearnHarness. See the [upstream overview](docs/UPSTREAM-README.md). This repository publishes source code; no fork installer is advertised as released or validated yet.
 
-## How it works
+## Run from source
 
-1. **Measure.** Before teaching, the agent finds where your understanding ends on each part the lesson depends on. Your answers, confidence, and thinking show it where to start.
-2. **Plan.** It works out a dependency map from that starting point to your goal. You can see the plan, and the lesson adapts when your understanding turns out different.
-3. **Teach.** Each step builds on something you already understand. You predict, get an explanation, and check your understanding. Confusions are repaired before anything is built on them. The aim is for the goal to feel obviously true, not merely familiar.
-4. **Practice.** Separate sessions pose varied problems that require the right knowledge to come to mind without being named first. Problems and hints adapt to your reasoning.
+Use **Node.js 24.22 or later** and npm. Clone this fork, then:
 
-**Think out loud.** The thinking fields let you explain your reasoning, uncertainties, and reactions in your own words. This is how the agent gets a detailed picture rather than just a record of right and wrong answers. You can type or use dictation.
-
-The agent can also research questions in the background, create visual explanations, and build interactive demonstrations.
-
-## Knowledge that carries forward
-
-What you are taught accumulates as propositions and reasoning chains: individual claims and the premises that lead to them. The graph shows this structure, with links back to the source sessions. You can also import notes.
-
-Future teaching sessions can read the graph instead of starting from scratch. Practice sessions can draw their material from it. It stores the ideas and their connections, not ratings of your ability.
-
-![LearnHarness knowledge graph](docs/assets/knowledge-graph.png)
-
-## Download and get started
-
-**[Download from learnharness.ai](https://learnharness.ai)** · [GitHub Releases](https://github.com/amosblomqvist/learnharness/releases)
-
-- **macOS (Apple Silicon):** signed and notarized DMG. Drag the app to Applications.
-- **Windows (x64):** run the installer. It is currently unsigned; Windows may show an “unknown publisher” or SmartScreen warning.
-- **Linux (x64):** make the AppImage executable and open it, or install the Debian/Ubuntu `.deb`.
-
-Add your provider API key and choose your models, then start a session with what you want to understand. LearnHarness supports 30+ provider options, including OpenAI, Anthropic, Google, DeepSeek, and OpenRouter. Optional dictation and web search use separate service keys.
-
-All three platforms support in-app updates.
-
-**Dictation:** Create a [Deepgram API key](https://console.deepgram.com/) with the **Member role or higher** ([required for token minting](https://developers.deepgram.com/reference/auth/tokens/grant)) and add it under **Settings → Providers → Dictation**. Choose the language below the key; **Multilingual** supports automatic recognition and mixed-language speech. A `403 Insufficient permissions` error during token minting can indicate an insufficient key role.
-
-## Your keys, your data
-
-- **Your keys and models.** No LearnHarness subscription or markup. You pay your providers for usage; a live cost meter shows model costs.
-- **Local storage.** Your chats, graph, settings, and API keys live on your machine. Learning records are plain files you can inspect.
-- **External services.** Models run through your configured providers. Model requests send the context needed for the task; web research and dictation also contact external services. Local storage does not mean offline processing.
-- **Inspectable behavior.** System prompts are visible and editable. The app is open source under the AGPL-3.0 license.
-
-## Development and support
-
-```bash
-npm install
-npm run dev        # http://localhost:3000
-npm test           # deterministic, no LLM, no network
+```sh
+npm ci
+npm run dev
 ```
 
-See the [development guide](docs/development.md), [architecture](docs/architecture.md), and [desktop release guide](docs/desktop-release.md).
+Open `http://localhost:3000`. Configure your own teaching model or subscription connection through Settings. A browser-only development session is separate from a packaged desktop profile.
 
-Questions, bug reports, and feature requests: [GitHub Issues](https://github.com/amosblomqvist/learnharness/issues).
+For the Electron development shell, use `npm run desktop:dev`. For speech setup, see [Google speech](docs/google-speech.md).
 
-## License
+```sh
+npm run typecheck
+npm test
+npm run lint
+npm run build
+```
 
-[AGPL-3.0](LICENSE)
+## Your keys and learning data
 
-The app is free and open forever. If we ever charge for anything, it will be for convenience — managed keys, hosting — never for features you can run locally.
+Every user supplies their own Google API key. Under **Settings → Providers → Read aloud**, add a Gemini key from [Google AI Studio](https://aistudio.google.com/api-keys). Check the project's billing tier and quotas there. This application does not activate billing or guarantee a free allowance.
+
+Speech sends the selected visible text to Google when a recording is needed. Cached replays and speed changes do not call Google. Google use is subject to its service terms. The text-generation model and its billing are configured separately.
+
+Chats, progress, audio, credentials and backups stay local and must not be committed. Runtime data is ignored by Git. See [SECURITY.md](SECURITY.md). Read-aloud uses the original text; selecting Italian delivery does not translate an English lesson.
+
+## Desktop builds and existing history
+
+The fork uses a separate **LearnHarness Personal** profile. It does not automatically import another installation's data. Close the apps and retain a backup before any manual migration; the machine-specific migration tools used during development are not part of this repository.
+
+For a Windows build from source, see [the fork build guide](docs/fork-desktop.md). The manual GitHub Actions workflow produces a test artifact only; it does not publish a GitHub Release. Upstream build instructions are historical references, not the release procedure for this fork.
+
+## Security review
+
+See [the review scope and findings](docs/security-review.md). This is a local single-user application, not an authenticated public web service. Keep it bound to loopback; do not expose its development or standalone server to a network.
+
+## Support and license
+
+Report fork-specific problems in [this fork's issue tracker](https://github.com/Landro1402/learnharness-personal/issues). Keep upstream acknowledgments and dependency license notices when redistributing.
+
+Original LearnHarness copyright remains with its respective contributors. This fork is maintained independently; the original author is not responsible for these modifications. You may modify and redistribute this work under **AGPL-3.0-only**, which also requires corresponding source when distributing binaries and a source offer for applicable remote network use. The software is provided **without warranty**, as described in [LICENSE](LICENSE).

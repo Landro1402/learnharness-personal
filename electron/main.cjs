@@ -1,3 +1,4 @@
+// LearnHarness Personal modifications maintained by Landro1402, 2026-10-29. See NOTICE.md and LICENSE (AGPL-3.0-only).
 /**
  * LearnHarness — the Electron shell (wrapper milestone, 2026-09-17).
  *
@@ -37,12 +38,15 @@ const fs = require("node:fs");
 const http = require("node:http");
 const net = require("node:net");
 const path = require("node:path");
+const { openSafeExternal } = require("./external-links.cjs");
+const openExternal = (target) => openSafeExternal(target, shell);
 
 // Mirrors SIDEBAR_AUTOCLOSE in components/sidebar.tsx — keep in sync (the
 // renderer owns the number; this is the IPC widen target).
 const SIDEBAR_AUTOCLOSE = 928;
 
-const PRODUCT_NAME = "LearnHarness";
+const PERSONAL_BUILD = require("../package.json").learnHarnessPersonal === true;
+const PRODUCT_NAME = PERSONAL_BUILD ? "LearnHarness Personal" : "LearnHarness";
 
 // APP NAME → userData (owner, 2026-10-10): the Application Support dir is
 // exactly "LearnHarness" in dev AND packaged. Packaged Electron would
@@ -51,6 +55,9 @@ const PRODUCT_NAME = "LearnHarness";
 // Must run before the LH_DEV_URL suffix below — dev becomes
 // "LearnHarness-dev".
 app.setName(PRODUCT_NAME);
+if (PERSONAL_BUILD && process.platform === "win32") app.setAppUserModelId?.("com.learnharness.personal");
+// Used only by local packaging checks; normal launches use their own AppData profile.
+if (PERSONAL_BUILD && process.env.LH_PERSONAL_PROFILE) app.setPath("userData", path.resolve(process.env.LH_PERSONAL_PROFILE));
 const AUTH_FILE = () => path.join(app.getPath("userData"), "auth.json");
 const DATA_DIR = () => path.join(app.getPath("userData"), "data");
 
@@ -361,13 +368,15 @@ function createWindow(url) {
 	});
 
 	win.webContents.on("will-navigate", (event, target) => {
-		if (new URL(target).origin !== allowedOrigin()) {
+		let internal = false;
+		try { internal = new URL(target).origin === allowedOrigin(); } catch { /* Reject malformed navigation. */ }
+		if (!internal) {
 			event.preventDefault();
-			void shell.openExternal(target);
+			void openExternal(target);
 		}
 	});
 	win.webContents.setWindowOpenHandler(({ url: target }) => {
-		void shell.openExternal(target);
+		void openExternal(target);
 		return { action: "deny" };
 	});
 
@@ -504,6 +513,11 @@ function installUpdateNow() {
 }
 
 function setupAutoUpdater() {
+	if (PERSONAL_BUILD) {
+		log("auto-update: personal build — official updates disabled");
+		reportUpdateStatus("disabled");
+		return;
+	}
 	if (!app.isPackaged) {
 		log("auto-update: dev build — updater disabled");
 		reportUpdateStatus("disabled");
@@ -660,7 +674,7 @@ async function main() {
 		});
 		chatgpt = createChatGPT({
 			store: fileStore(path.join(app.getPath("userData"), "chatgpt-credentials.json")),
-			openExternal: (target) => shell.openExternal(target),
+			openExternal,
 			onChange: (value) => {
 				chatgptChild?.send(value);
 				for (const win of BrowserWindow.getAllWindows()) win.webContents.send("lh:chatgpt:changed");
@@ -669,7 +683,7 @@ async function main() {
 		subscriptions = createSubscriptions({
 			directory: app.getPath("userData"),
 			loadSDK: () => loadSubscriptionSDK(path.dirname(serverEntry())),
-			openExternal: (target) => shell.openExternal(target),
+			openExternal,
 			onChange: (snapshot) => {
 				subscriptionChild?.send(snapshot);
 				for (const win of BrowserWindow.getAllWindows()) win.webContents.send("lh:subscriptions:changed");
@@ -706,7 +720,7 @@ async function main() {
 	// Next server may be resolved here; never accept an arbitrary external URL.
 	ipcMain.handle("lh:subscriptions:web-browser", async (event, action) => {
 		if (!devUrl || !trustedAppWindows.has(BrowserWindow.fromWebContents(event.sender)) || !trustedSender(event, new URL(url).origin, BrowserWindow)) throw new Error("Untrusted development request.");
-		await openWebSubscriptionBrowser(action, new URL(url).origin, { openExternal: (target) => shell.openExternal(target) });
+		await openWebSubscriptionBrowser(action, new URL(url).origin, { openExternal });
 	});
 
 	installMenu();

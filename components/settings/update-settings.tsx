@@ -1,4 +1,5 @@
 "use client";
+// LearnHarness Personal modifications maintained by Landro1402, 2026-10-29. See NOTICE.md and LICENSE (AGPL-3.0-only).
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -76,6 +77,7 @@ export function UpdateSettings({
 	const status = state?.status === "downloaded" ? updateStatusText(state)
 		: failed || checkFailed ? UPDATE_ERROR : updateStatusText(state);
 	const releaseNotes = version && homepage ? `${homepage}/releases/tag/v${version}` : null;
+	const personal = version.includes("-personal.");
 	const check = () => {
 		setCheckFailed(false);
 		void window.lh?.checkForUpdates?.().catch(() => setCheckFailed(true));
@@ -90,7 +92,12 @@ export function UpdateSettings({
 					<>
 						{status && <span className="block" role="status" data-testid="update-status">{status}</span>}
 						{active && <span className="block">{MANUAL_UPDATE_HINT}</span>}
-						{releaseNotes && <a href={releaseNotes} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:text-foreground hover:underline" data-testid="release-notes">Release notes</a>}
+						{personal ? <span className="block" data-testid="fork-legal-notice">
+							LearnHarness © its contributors; original project by Amos Blomqvist. Personal modifications maintained by Landro1402, dated 2026-10-29.
+							<span className="block">AGPL-3.0-only · Redistribution permitted under the license · No warranty.</span>
+							<a href={`${homepage}/tree/codex/google-voice-fork`} target="_blank" rel="noopener noreferrer" className="underline">Source code</a>{" · "}
+							<a href={`${homepage}/blob/codex/google-voice-fork/LICENSE`} target="_blank" rel="noopener noreferrer" className="underline">License</a>
+						</span> : releaseNotes && <a href={releaseNotes} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:text-foreground hover:underline" data-testid="release-notes">Release notes</a>}
 					</>
 				}
 			>

@@ -1,3 +1,4 @@
+// LearnHarness Personal modifications maintained by Landro1402, 2026-10-29. See NOTICE.md and LICENSE (AGPL-3.0-only).
 /**
  * The final release gate (scripts/verify-release.ts) — pure-function tests
  * plus CLI end-to-end runs, all offline against fixtures. The expected asset
@@ -309,7 +310,7 @@ describe("release gate — update feeds", () => {
 
 describe("release gate — workflow wiring", () => {
 	const yaml = require("js-yaml") as { load(source: string): any };
-	const workflow = yaml.load(fs.readFileSync(path.join(repoRoot, ".github", "workflows", "release.yml"), "utf8"));
+	const workflow = yaml.load(fs.readFileSync(path.join(repoRoot, ".github", "upstream-workflows", "release.yml"), "utf8"));
 	const verify = workflow.jobs.verify;
 
 	it("can see drafts after ALL packaging jobs, only on real tag pushes", () => {

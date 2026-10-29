@@ -1,4 +1,5 @@
 "use client";
+// LearnHarness Personal modifications maintained by Landro1402, 2026-10-29. See NOTICE.md and LICENSE (AGPL-3.0-only).
 /**
  * The Keys section (wave-5 polish, 2026-09-21 — owner design): a MINIMAL
  * key-value table. Provider left, masked key right, no description hints
@@ -166,7 +167,7 @@ function KeyTableRow({
 				<div className="flex items-center gap-2 rounded-sm px-1 py-1.5" data-testid={`${testid}-editor`}>
 					<span className="shrink-0 font-ui text-xs text-foreground">{label}</span>
 					<input
-						type="text"
+						type={status.id === "GEMINI_TTS_API_KEY" ? "password" : "text"}
 						value={value}
 						onChange={(e) => setValue(e.target.value)}
 						onKeyDown={(e) => {
@@ -471,8 +472,8 @@ export function KeysSection({
 				<SubscriptionConnections />
 			</SettingsGroup>
 
-			{(["Dictation", "Search"] as const).map((label) => <SettingsGroup key={label} label={label} testid={label === "Dictation" ? "group-dictation" : "group-search"}>
-				{toolRows.filter((status) => label === "Dictation" ? status.id === "DEEPGRAM_API_KEY" : status.id !== "DEEPGRAM_API_KEY").map((status) => (
+			{(["Read aloud", "Dictation", "Search"] as const).map((label) => <SettingsGroup key={label} label={label} testid={label === "Read aloud" ? "group-speech" : label === "Dictation" ? "group-dictation" : "group-search"}>
+				{toolRows.filter((status) => label === "Read aloud" ? status.id === "GEMINI_TTS_API_KEY" : label === "Dictation" ? status.id === "DEEPGRAM_API_KEY" : !["DEEPGRAM_API_KEY", "GEMINI_TTS_API_KEY"].includes(status.id)).map((status) => (
 					<KeyTableRow
 						key={status.id}
 						label={status.info?.label ?? status.id}

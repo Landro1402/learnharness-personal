@@ -1,0 +1,21 @@
+# Independent fork identity; no upstream publishing or update feed.
+extends: ./electron-builder.yml
+appId: com.learnharness.personal
+productName: LearnHarness Personal
+publish: null
+directories:
+  output: dist/personal-packages
+win:
+  target:
+    - target: zip
+      arch: [x64]
+extraResources:
+  - from: .next
+    to: server
+    filter: ["standalone/**/*"]
+  - from: LICENSE
+    to: licenses/LearnHarness-AGPL-3.0.txt
+  - from: NOTICE.md
+    to: licenses/NOTICE.md
+  - from: docs/compaction-accounting.md
+    to: licenses/pi-compaction.md

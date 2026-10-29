@@ -1,3 +1,4 @@
+// LearnHarness Personal modifications maintained by Landro1402, 2026-10-29. See NOTICE.md and LICENSE (AGPL-3.0-only).
 /** Actual shell functions with fake Electron/updater/filesystem. No app,
  * profile, network, timer or updater download/install operation is run. */
 import assert from "node:assert/strict";
@@ -13,7 +14,7 @@ const mainFile = fileURLToPath(new URL("../electron/main.cjs", import.meta.url))
 const mainSource = readFileSync(mainFile, "utf8");
 const mainRequire = createRequire(mainFile);
 
-function fixture({ packaged = true, updaterMissing = false } = {}) {
+function fixture({ packaged = true, updaterMissing = false, personal = false } = {}) {
 	let settings: string | Error = JSON.stringify({ version: 1, general: { autoUpdate: true } });
 	const settingsReads: string[] = [];
 	const order: string[] = [];
@@ -71,7 +72,7 @@ function fixture({ packaged = true, updaterMissing = false } = {}) {
 	const app = Object.assign(new EventEmitter(), {
 		isPackaged: packaged,
 		name: "LearnHarness",
-		setName() {},
+		setName(value: string) { this.name = value; },
 		getPath: () => userData,
 		setPath: (_: string, value: string) => { userData = value; },
 		requestSingleInstanceLock: () => false,
@@ -86,6 +87,7 @@ function fixture({ packaged = true, updaterMissing = false } = {}) {
 	};
 	const context = createContext({
 		require: (id: string) => {
+			if (id === "../package.json") return { learnHarnessPersonal: personal };
 			if (id === "electron") return electron;
 			if (id === "electron-updater") {
 				if (updaterMissing) throw new Error("missing updater");
@@ -121,6 +123,16 @@ function fixture({ packaged = true, updaterMissing = false } = {}) {
 }
 
 describe("automatic-update preference gate", () => {
+	it("personal builds have a separate identity and never load or check the official updater", async () => {
+		const f = fixture({ personal: true });
+		assert.equal(f.app.name, "LearnHarness Personal");
+		f.run("setupAutoUpdater()");
+		await f.check(); await f.check(true);
+		assert.equal(f.state().status, "disabled");
+		assert.equal(f.updater.checks, 0);
+		assert.equal(f.updater.autoDownload, false);
+		assert.equal(f.updater.autoInstallOnAppQuit, false);
+	});
 	it("explicit OFF skips automatic checks, but manual checks still run without reading the preference", async () => {
 		const f = fixture();
 		f.setSettings({ general: { autoUpdate: false } });

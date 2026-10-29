@@ -1,4 +1,5 @@
 "use client";
+// LearnHarness Personal modifications maintained by Landro1402, 2026-10-29. See NOTICE.md and LICENSE (AGPL-3.0-only).
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDownIcon, ChevronRightIcon, PlayIcon } from "lucide-react";
@@ -7,6 +8,7 @@ import { finishDictation, isDictationActive, joinDictation, useDictationTarget }
 import { useEnterSubmits } from "@/components/enter-submits";
 import { ToolContentResponse } from "@/components/ai-elements/message";
 import { cn } from "@/lib/utils";
+import { ReadAloud } from "@/components/read-aloud";
 import {
 	buildAnswer,
 	repairMathForDisplay,
@@ -22,6 +24,7 @@ import {
 	parseAskInput,
 	parseQuizInput,
 	parseExplainInput,
+	questionTextForSpeech,
 	toggleOption,
 	toggleOther,
 	type AnswerRequest,
@@ -588,6 +591,7 @@ function QuestionDockForm({
 					</div>
 				)}
 
+				<ReadAloud text={questionTextForSpeech(qd)} />
 				{qd.mode !== "text" && (
 					<div className="flex flex-col gap-2 pb-2" role={qd.mode === "multi-select" ? "group" : "radiogroup"}>
 						{qd.options.map((opt, i) => {
